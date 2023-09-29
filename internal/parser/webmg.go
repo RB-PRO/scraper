@@ -31,13 +31,13 @@ func Parsing_webmg() {
 			log.Fatalln(Category.Name, ErrCategory)
 		}
 
+		var data []webmg.DataXLM
+
 		// Цикл по всем статьям
 		Bar := pb.StartNew(len(ArticlesLinks))
 		Bar.Prefix(Category.Name)
 		for _, ArticleLink := range ArticlesLinks {
-			// if i == 3 {
-			// 	break
-			// }
+
 			photos, info, ErrPhotos := webmg.ParsePhoto(ArticleLink)
 			if ErrPhotos != nil {
 				log.Fatalln(Category.Name, ErrPhotos)
@@ -48,15 +48,22 @@ func Parsing_webmg() {
 				// https://webmg.ru/wp-content/uploads/2023/09/10097-8-jpg.webp
 				FileName := EditFileName(photos[iPhoto].URL)
 
-				photos[iPhoto].Path = DirectionForPhotos + "\\" + FileName
+				dr.SavePhoto(photos[iPhoto].URL, DirectionForPhotos+"/"+FileName)
 
-				dr.SavePhoto(photos[iPhoto].URL, photos[iPhoto].Path)
+				photos[iPhoto].Path = "webmg/" + Category.Slug + "/" + info.Slug + "/" + FileName
 			}
 			xlsx.WriteXLSX(Category, info, photos)
+			data = append(data, webmg.DataXLM{
+				Cat:    Category,
+				Info:   info,
+				Photos: photos,
+			})
 
 			Bar.Increment()
 		}
 		Bar.Finish()
+
+		webmg.SaveXML("webmg/"+Category.Slug+"/"+"data.xml", data)
 	}
 	xlsx.CloceAndSaveXLSX()
 }

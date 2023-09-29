@@ -7,7 +7,7 @@ import (
 )
 
 func TestParserPhoto(t *testing.T) {
-	url := "https://webmg.ru/kartinki-rapuntsel-dlya-srisovki-100-risunkov/"
+	url := "https://webmg.ru/kartinki-na-den-kofe-56-otkrytok/"
 	photos, info, err := ParsePhoto(url)
 	if err != nil {
 		t.Error()

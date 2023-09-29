@@ -62,6 +62,9 @@ func ParsePhoto(URL string) (photos []Photo, info Info, Err error) {
 
 // Редактировать текста по этой статье
 func EditInfo(str string) string {
+	str = strings.ReplaceAll(str, "&#x9;", "")
+	str = strings.ReplaceAll(str, "&#xA;", "")
+	str = strings.ReplaceAll(str, "\t", "")
 	str = strings.ReplaceAll(str, "\n", "")
 	str = strings.TrimSpace(str)
 	return str
