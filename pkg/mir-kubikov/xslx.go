@@ -51,6 +51,6 @@ func (x *XLSX) WriteXLSX(Products Product) {
 	x.f.SetCellValue(x.SheetName, "E"+strconv.Itoa(x.line), strings.Join(Products.PhotoLinks, ";"))
 	x.f.SetCellValue(x.SheetName, "F"+strconv.Itoa(x.line), strings.Join(Products.PhotoPaths, ";"))
 	x.f.SetCellValue(x.SheetName, "G"+strconv.Itoa(x.line), Products.URL)
-
+	x.f.Save()
 	x.line++ // Иттерирование по строкам
 }

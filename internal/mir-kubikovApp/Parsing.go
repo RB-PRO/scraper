@@ -14,57 +14,67 @@ func Parsing() {
 
 	dr := mirkubikov.NewDir("mir-kubikov/")
 	xlsx := mirkubikov.NewXLSX("mir-kubikov/mir-kubikov.xlsx")
+	core, _ := mirkubikov.NewCore()
+	defer core.DeleteCore()
+	defer xlsx.CloceAndSaveXLSX()
 
-	ProductsUrlsAll := make([]string, 0, 1000)
-	Bar := pb.StartNew(100)
-	Bar.Increment()
 	for page := 1; ; page++ {
+		if page < 29 {
+			continue
+		}
 		url := fmt.Sprintf(URL, page)
 		ProductsUrls, NextPageIsExit, ErrParseProductsUrl := mirkubikov.ParseProductsUrl(url)
 		if ErrParseProductsUrl != nil {
 			panic(ErrParseProductsUrl)
 		}
-		ProductsUrlsAll = append(ProductsUrlsAll, ProductsUrls...)
+
+		BarProd := pb.StartNew(len(ProductsUrls))
+		for _, ProductUrl := range ProductsUrls {
+			// product, ErrParse := mirkubikov.ParseProduct(ProductUrl)
+			product, ErrParse := core.Parsing(ProductUrl)
+			product.URL = ProductUrl
+			if ErrParse != nil {
+				panic(ErrParse)
+			}
+
+			// Скачивание фото
+			dr.MakeDir(product.SKU)
+			if product.SKU == "" {
+				fmt.Println("---SKU nill>", product.URL)
+			}
+			if len(product.PhotoLinks) == 0 {
+				fmt.Println("---0>", product.URL)
+			}
+			for ilink, link := range product.PhotoLinks {
+				BarProd.Prefix(fmt.Sprintf("[%d][%d/%d]", page, ilink+1, len(product.PhotoLinks)))
+				ErrSavePhoto := dr.SavePhoto(link, fmt.Sprintf("mir-kubikov/%s/%d.jpeg", product.SKU, ilink))
+				if ErrSavePhoto != nil {
+					fmt.Println("--->", ErrSavePhoto)
+				}
+				product.PhotoPaths = append(product.PhotoPaths, fmt.Sprintf("mir-kubikov/%s/%d.jpeg", product.SKU, ilink))
+				time.Sleep(500 * time.Millisecond)
+			}
+
+			xlsx.WriteXLSX(product)
+
+			BarProd.Increment()
+			// break
+			time.Sleep(time.Second)
+		}
+		BarProd.Finish()
+
+		// Если дальше страниц не будет
 		if !NextPageIsExit {
 			break
 		}
-		Bar.Increment()
 		// break
 		time.Sleep(time.Second)
 	}
-	Bar.Finish()
 
 	//
 	// Парсинг каждого товара
-	products := make([]mirkubikov.Product, len(ProductsUrlsAll))
-	BarProd := pb.StartNew(len(ProductsUrlsAll))
-	for iProductUrl, ProductUrl := range ProductsUrlsAll {
-		product, ErrParse := mirkubikov.ParseProduct(ProductUrl)
-		if ErrParse != nil {
-			panic(ErrParse)
-		}
-
-		// Скачивание фото
-		dr.MakeDir(product.SKU)
-		for ilink, link := range product.PhotoLinks {
-			BarProd.Prefix(fmt.Sprintf("[%d/%d]", ilink+1, len(product.PhotoLinks)))
-			dr.SavePhoto(link, fmt.Sprintf("mir-kubikov/%s/%d.jpeg", product.SKU, ilink))
-			product.PhotoPaths = append(product.PhotoPaths, fmt.Sprintf("mir-kubikov/%s/%d.jpeg", product.SKU, ilink))
-			time.Sleep(200 * time.Millisecond)
-		}
-		products[iProductUrl] = product
-
-		xlsx.WriteXLSX(product)
-
-		BarProd.Increment()
-		// break
-		time.Sleep(time.Second)
-	}
-	BarProd.Finish()
-	xlsx.CloceAndSaveXLSX()
 
 	// fmt.Println(products[0])
-
 }
 
 // Получить название файла по ссылке на файл
