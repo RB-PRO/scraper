@@ -19,7 +19,7 @@ func Parsing() {
 	defer xlsx.CloceAndSaveXLSX()
 
 	for page := 1; ; page++ {
-		if page < 29 {
+		if page < 72 {
 			continue
 		}
 		url := fmt.Sprintf(URL, page)
@@ -34,7 +34,8 @@ func Parsing() {
 			product, ErrParse := core.Parsing(ProductUrl)
 			product.URL = ProductUrl
 			if ErrParse != nil {
-				panic(ErrParse)
+				//panic(ErrParse)
+				continue
 			}
 
 			// Скачивание фото

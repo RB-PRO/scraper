@@ -7,5 +7,6 @@ import (
 func main() {
 	//parser.Parsing_webmg()
 	// parser.Parsing_4x4photo()
-	mirkubikovapp.Parsing()
+	// mirkubikovapp.Parsing()
+	mirkubikovapp.Categorys()
 }

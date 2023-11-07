@@ -165,10 +165,12 @@ func (c *Core) Parsing(url string) (prod Product, Err error) {
 	// Цена
 	ElementHandlePrice, ErrElementHandlePrice := c.pagea.QuerySelector("span[class=js-datalayer-data]")
 	if ErrElementHandlePrice == nil {
-		PriceStr, err := ElementHandlePrice.GetAttribute("data-price")
-		if err == nil {
-			if Price, err := strconv.ParseFloat(PriceStr, 64); err == nil {
-				prod.Price = Price
+		if ElementHandlePrice != nil {
+			PriceStr, err := ElementHandlePrice.GetAttribute("data-price")
+			if err == nil {
+				if Price, err := strconv.ParseFloat(PriceStr, 64); err == nil {
+					prod.Price = Price
+				}
 			}
 		}
 	}
