@@ -1,7 +1,7 @@
 package main
 
 import (
-	padentikom "github.com/RB-PRO/PhotoTemaParser/internal/pa-dentikom"
+	scraperfogplay "github.com/RB-PRO/PhotoTemaParser/internal/scraper-fogplay"
 )
 
 func main() {
@@ -10,5 +10,6 @@ func main() {
 	// mirkubikovapp.Parsing()
 	// mirkubikovapp.Categorys()
 	// gotextiletorg.Parsing()
-	padentikom.Parsing()
+	// padentikom.Parsing()
+	scraperfogplay.Parsing()
 }
